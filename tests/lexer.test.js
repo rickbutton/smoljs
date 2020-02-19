@@ -36,7 +36,7 @@ describe("members", () => {
     it("should correctly lex member expressions", () => {
         expect(lex("abc.xyz")).toEqual([
             { type: "word", value: "abc" },
-            { type: "dot" },
+            { type: "." },
             { type: "word", value: "xyz" },
         ])
     });
@@ -46,24 +46,24 @@ describe("functions", () => {
     it("correctly lexes function declarations", () => {
         expect(lex(`function() {  }`)).toEqual([
             { type: "word", value: "function" },
-            { type: "lparen" },
-            { type: "rparen" },
-            { type: "lbrace" },
-            { type: "rbrace" },
+            { type: "(" },
+            { type: ")" },
+            { type: "{" },
+            { type: "}" },
         ]);
 
         expect(lex(`function(foo, bar, baz) { foo; bar; baz; }`)).toEqual([
             { type: "word", value: "function" },
-            { type: "lparen" },
-            { type: "word", value: "foo" }, { type: "comma" },
-            { type: "word", value: "bar" }, { type: "comma" },
+            { type: "(" },
+            { type: "word", value: "foo" }, { type: "," },
+            { type: "word", value: "bar" }, { type: "," },
             { type: "word", value: "baz" },
-            { type: "rparen" },
-            { type: "lbrace" },
-            { type: "word", value: "foo" }, { type: "semi" },
-            { type: "word", value: "bar" }, { type: "semi" },
-            { type: "word", value: "baz" }, { type: "semi" },
-            { type: "rbrace" },
+            { type: ")" },
+            { type: "{" },
+            { type: "word", value: "foo" }, { type: ";" },
+            { type: "word", value: "bar" }, { type: ";" },
+            { type: "word", value: "baz" }, { type: ";" },
+            { type: "}" },
         ]);
     });
 })
@@ -71,11 +71,11 @@ describe("functions", () => {
 describe("object literals", () => {
     it("correctly lexes object literals", () => {
         expect(lex("{ foo: 123 }")).toEqual([
-            { type: "lbrace" },
+            { type: "{" },
             { type: "word", value: "foo" },
-            { type: "colon" },
+            { type: ":" },
             { type: "number", value: 123 },
-            { type: "rbrace" },
+            { type: "}" },
         ]);
     });
 });
@@ -83,11 +83,11 @@ describe("object literals", () => {
 describe("array literals", () => {
     it("correctly lexes array literals", () => {
         expect(lex("[123, 456]")).toEqual([
-            { type: "lbracket" },
+            { type: "[" },
             { type: "number", value: 123 },
-            { type: "comma" },
+            { type: "," },
             { type: "number", value: 456 },
-            { type: "rbracket" },
+            { type: "]" },
         ]);
     });
 });
