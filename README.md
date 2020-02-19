@@ -13,8 +13,7 @@ in `JavaScript`, and fun stuff like self-hosting and metacircular interpreters.
 
 # TODO
 
-- more tests for the lexer
-- parser (lol)
+- finish parser
 - tree-walking evaluator
 - bytecode emitter?
 - bytecode interpreter?
@@ -23,3 +22,4 @@ in `JavaScript`, and fun stuff like self-hosting and metacircular interpreters.
 # DONE
 
 - a `smoljs` compatible lexer
+- most of a parser

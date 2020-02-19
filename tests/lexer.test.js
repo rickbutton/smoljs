@@ -23,7 +23,7 @@ describe("strings", () => {
         expect(() => lex('"123')).toThrow("unexpected end of line");
     });
 });
-describe("words", () => {
+describe("identifiers", () => {
     it("should correctly lex valid identifiers", () => {
         expect(lex("fooBarBaz")).toEqual([{ type: "word", value: "fooBarBaz" }]);
         expect(lex("_fooBarBaz")).toEqual([{ type: "word", value: "_fooBarBaz" }]);
@@ -42,10 +42,43 @@ describe("members", () => {
     });
 });
 
+describe("unary operators", () => {
+    it("should correctly lex unary", () => {
+        expect(lex("+123")).toEqual([
+            { type: "+", },
+            { type: "number", value: 123 },
+        ]);
+        expect(lex("-123")).toEqual([
+            { type: "-", },
+            { type: "number", value: 123 },
+        ]);
+        expect(lex("!123")).toEqual([
+            { type: "!", },
+            { type: "number", value: 123 },
+        ]);
+    });
+});
+
+describe("binary operators", () => {
+    it("should correctly lex binary", () => {
+        const operators = 
+            ["+", "-", "*",  "<", ">", 
+             "<=", ">=", "=", "===",
+            "&&", "||"];
+        for (const op of operators) {
+            expect(lex("123" + op + "456")).toEqual([
+                { type: "number", value: 123 },
+                { type: op, },
+                { type: "number", value: 456 },
+            ]);
+        }
+    });
+});
+
 describe("functions", () => {
     it("correctly lexes function declarations", () => {
         expect(lex(`function() {  }`)).toEqual([
-            { type: "word", value: "function" },
+            { type: "function", value: "function" },
             { type: "(" },
             { type: ")" },
             { type: "{" },
@@ -53,7 +86,7 @@ describe("functions", () => {
         ]);
 
         expect(lex(`function(foo, bar, baz) { foo; bar; baz; }`)).toEqual([
-            { type: "word", value: "function" },
+            { type: "function", value: "function" },
             { type: "(" },
             { type: "word", value: "foo" }, { type: "," },
             { type: "word", value: "bar" }, { type: "," },
