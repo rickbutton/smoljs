@@ -5,7 +5,7 @@ export function lex(str) {
         str,
     };
 
-    return lexNext(state).tokens;
+    return lexState(state).tokens;
 }
 
 function currentChar(state) {
@@ -23,7 +23,8 @@ function isAlpha(char) { return (char >= "a" && char <= "z") || (char >= "A" && 
 function isNumeric(char) { return char >= "0" && char <= "9"; }
 function numericCharToNumber(char) { return char.charCodeAt(0) - "0".charCodeAt(0); }
 function isIdentifierStart(char) { return char === "$" || char === "_" || isAlpha(char); }
-function isIdentifierChar(char) { return char === "$" || char === "_" || isNumeric(char) || isAlpha(char); }
+function isIdentifierChar(char) { 
+    return char === "$" || char === "_" || isNumeric(char) || isAlpha(char); }
 function isWhitespace(char) { return char === " " || char === "\t" || char === "\n"; }
 
 const PUNCTUATION = {
@@ -43,33 +44,36 @@ const PUNCTUATION = {
 };
 function isPunctuation(char) { return PUNCTUATION[char] !== undefined; }
 
-function lexNext(state) {
-    const char = currentChar(state);
+function lexState(state) {
 
-    if (isNumeric(char)) {
-        return lexNumber(state);
-    } else if (char === "\"") {
-        return lexString(state);
-    } else if (isIdentifierStart(char)) {
-        return lexWord(state);
-    } else if (isPunctuation(char)) {
-        return lexPunctuation(state);
-    } else if (char === "<" || char === ">") {
-        return lexLessOrGreaterThan(state);
-    } else if (char === "=") {
-        return lexEqual(state);
-    } else if (char === "!") {
-        return lexNot(state);
-    } else if (char === "|" || char === "&") {
-        return lexBoolean(state);
-    } else if (isWhitespace(char)) {
-        advanceChar(state);
-        return lexNext(state);
-    } else if (char === "") {
-        return state;
-    } else {
-        throw new Error("unexpected character '" + char + "'");
+    let char;
+    while (char !== "") {
+        char = currentChar(state);
+
+        if (isNumeric(char)) {
+            lexNumber(state);
+        } else if (char === "\"") {
+            lexString(state);
+        } else if (isIdentifierStart(char)) {
+            lexWord(state);
+        } else if (isPunctuation(char)) {
+            lexPunctuation(state);
+        } else if (char === "<" || char === ">") {
+            lexLessOrGreaterThan(state);
+        } else if (char === "=") {
+            lexEqual(state);
+        } else if (char === "!") {
+            lexNot(state);
+        } else if (char === "|" || char === "&") {
+            lexBoolean(state);
+        } else if (isWhitespace(char)) {
+            advanceChar(state);
+        } else if (char !== "") {
+            throw new Error("unexpected character '" + char + "'");
+        }
     }
+
+    return state;
 }
 
 function lexNumber(state) {
@@ -84,7 +88,6 @@ function lexNumber(state) {
         type: "number",
         value,
     });
-    return lexNext(state);
 }
 
 function lexString(state) {
@@ -127,7 +130,6 @@ function lexString(state) {
         type: "string",
         value,
     });
-    return lexNext(state);
 }
 
 function lexWord(state) {
@@ -146,7 +148,6 @@ function lexWord(state) {
         type: "word",
         value,
     });
-    return lexNext(state);
 }
 
 function lexPunctuation(state) {
@@ -157,7 +158,6 @@ function lexPunctuation(state) {
     state.tokens.push({
         type,
     });
-    return lexNext(state);
 }
 
 function lexLessOrGreaterThan(state) {
@@ -178,7 +178,6 @@ function lexLessOrGreaterThan(state) {
     }
 
     state.tokens.push({ type });
-    return lexNext(state);
 }
 
 function lexEqual(state) {
@@ -196,16 +195,16 @@ function lexEqual(state) {
     } else {
         state.tokens.push({ type: "eq" });
     }
-    return lexNext(state);
 }
 
 function lexBoolean(state) {
     const char = currentChar(state);
     const next = nextChar(state);
+    const token = char + next;
 
-    if (char === "|" && next === "|") {
+    if (token === "||") {
         state.tokens.push({ type: "or" });
-    } else if (char === "&" && next === "&") {
+    } else if (token === "&&") {
         state.tokens.push({ type: "and" });
     } else {
         throw new Error("unexpected character '" + next + "'");
@@ -213,7 +212,6 @@ function lexBoolean(state) {
 
     advanceChar(state);
     advanceChar(state);
-    return lexNext(state);
 }
 
 function lexNot(state) {
@@ -229,5 +227,4 @@ function lexNot(state) {
     } else {
         state.tokens.push({ type: "not" });
     }
-    return lexNext(state);
 }
